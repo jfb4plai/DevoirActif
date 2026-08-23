@@ -96,7 +96,7 @@ export default function DevoirGenerator() {
 
   return (
     <div className="plai-section">
-      <h1>DevoirActif</h1>
+      <h2>Un devoir, un format résistant au scan + IA</h2>
 
       <label className="plai-label" htmlFor="niveau">Niveau</label>
       <select id="niveau" className="plai-input" value={niveau} onChange={(e) => setNiveau(e.target.value)}>
