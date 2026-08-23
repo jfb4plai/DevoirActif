@@ -2,7 +2,7 @@ import { Document, Paragraph, HeadingLevel, Packer } from 'docx'
 import { saveAs } from 'file-saver'
 import { construireParagraphesFiche } from './construireParagraphesFiche.js'
 
-export function construireDocumentDevoir({ niveau, matiere, competence, formatLabel, consigneTexte, ficheContenu }) {
+export function construireDocumentDevoir({ niveau, matiere, competence, formatLabel, consigneTexte, ficheContenu = '' }) {
   const enfants = [
     new Paragraph({ text: `Devoir — ${matiere} (${niveau})`, heading: HeadingLevel.HEADING_1 }),
     new Paragraph({ text: `Compétence : ${competence}` }),
@@ -26,6 +26,8 @@ export function construireDocumentDevoir({ niveau, matiere, competence, formatLa
 export async function exporterDevoirDocx(params) {
   const doc = construireDocumentDevoir(params)
   const blob = await Packer.toBlob(doc)
-  const nomFichier = `devoir-${params.niveau}-${params.matiere}.docx`.replace(/\s+/g, '_')
+  const nomFichier = `devoir-${params.niveau}-${params.matiere}.docx`
+    .replace(/\s+/g, '_')
+    .replace(/[\\/:*?"<>|]/g, '-')
   saveAs(blob, nomFichier)
 }
