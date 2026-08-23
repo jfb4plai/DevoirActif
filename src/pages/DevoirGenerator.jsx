@@ -14,6 +14,8 @@ export default function DevoirGenerator() {
   const [resultat, setResultat] = useState(null)
   const [enCours, setEnCours] = useState(false)
   const [erreur, setErreur] = useState('')
+  const [sauvegardeEnCours, setSauvegardeEnCours] = useState(false)
+  const [sauvegardeStatut, setSauvegardeStatut] = useState(null)
 
   const formatChoisi = FORMATS.find((f) => f.id === formatId)
 
@@ -44,16 +46,33 @@ export default function DevoirGenerator() {
 
   async function sauvegarderHistorique() {
     if (!resultat) return
-    const { data: userData } = await supabase.auth.getUser()
-    await supabase.from('devoir_historique').insert({
-      user_id: userData.user.id,
-      niveau,
-      matiere,
-      competence,
-      format: formatId,
-      consigne_texte: resultat.consigne_texte,
-      fiche_contenu: resultat.fiche_contenu,
-    })
+    setSauvegardeEnCours(true)
+    setSauvegardeStatut(null)
+    try {
+      const { data: userData, error: erreurUser } = await supabase.auth.getUser()
+      if (erreurUser || !userData?.user) {
+        setSauvegardeStatut({ type: 'erreur', message: 'Session expirée — reconnectez-vous avant d\'enregistrer.' })
+        return
+      }
+      const { error: erreurInsert } = await supabase.from('devoir_historique').insert({
+        user_id: userData.user.id,
+        niveau,
+        matiere,
+        competence,
+        format: formatId,
+        consigne_texte: resultat.consigne_texte,
+        fiche_contenu: resultat.fiche_contenu,
+      })
+      if (erreurInsert) {
+        setSauvegardeStatut({ type: 'erreur', message: `Échec de l'enregistrement : ${erreurInsert.message}` })
+        return
+      }
+      setSauvegardeStatut({ type: 'succes', message: 'Enregistré.' })
+    } catch (err) {
+      setSauvegardeStatut({ type: 'erreur', message: `Échec de l'enregistrement : ${err.message}` })
+    } finally {
+      setSauvegardeEnCours(false)
+    }
   }
 
   async function exporterFiche() {
@@ -76,6 +95,9 @@ export default function DevoirGenerator() {
       <select id="niveau" className="plai-input" value={niveau} onChange={(e) => setNiveau(e.target.value)}>
         {NIVEAUX.map((n) => <option key={n} value={n}>{n}</option>)}
       </select>
+      <p className="plai-help">
+        Le niveau ajuste le vocabulaire et la complexité de la consigne générée, et la durée proposée pour le format chrono sans ressource.
+      </p>
 
       <label className="plai-label" htmlFor="matiere">Matière</label>
       <input
@@ -154,9 +176,17 @@ export default function DevoirGenerator() {
             </>
           )}
 
-          <button type="button" className="plai-btn" onClick={sauvegarderHistorique}>Enregistrer</button>
+          <button type="button" className="plai-btn" onClick={sauvegarderHistorique} disabled={sauvegardeEnCours}>
+            {sauvegardeEnCours ? 'Enregistrement…' : 'Enregistrer'}
+          </button>
           {formatChoisi.needsFiche && (
             <button type="button" className="plai-btn" onClick={exporterFiche}>Exporter la fiche (.docx)</button>
+          )}
+
+          {sauvegardeStatut && (
+            <p className={sauvegardeStatut.type === 'succes' ? 'plai-success' : 'plai-error'}>
+              {sauvegardeStatut.message}
+            </p>
           )}
         </div>
       )}
