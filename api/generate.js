@@ -60,6 +60,9 @@ export default async function handler(req, res) {
     const data = await resp.json()
     const texte = data.content?.[0]?.text ?? '{}'
     const resultat = JSON.parse(texte)
+    if (!resultat.consigne_texte || !resultat.consigne_texte.trim()) {
+      return res.status(502).json({ error: 'Réponse IA incomplète ou vide — réessaie.' })
+    }
     return res.status(200).json({ resultat })
   } catch (err) {
     return res.status(500).json({ error: `Erreur serveur : ${err.message}` })

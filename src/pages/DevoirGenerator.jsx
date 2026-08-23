@@ -16,6 +16,7 @@ export default function DevoirGenerator() {
   const [erreur, setErreur] = useState('')
   const [sauvegardeEnCours, setSauvegardeEnCours] = useState(false)
   const [sauvegardeStatut, setSauvegardeStatut] = useState(null)
+  const [exportEnCours, setExportEnCours] = useState(false)
 
   const formatChoisi = FORMATS.find((f) => f.id === formatId)
 
@@ -78,14 +79,19 @@ export default function DevoirGenerator() {
 
   async function exporterFiche() {
     if (!resultat) return
-    await exporterDevoirDocx({
-      niveau,
-      matiere,
-      competence,
-      formatLabel: formatChoisi.label,
-      consigneTexte: resultat.consigne_texte,
-      ficheContenu: resultat.fiche_contenu,
-    })
+    setExportEnCours(true)
+    try {
+      await exporterDevoirDocx({
+        niveau,
+        matiere,
+        competence,
+        formatLabel: formatChoisi.label,
+        consigneTexte: resultat.consigne_texte,
+        ficheContenu: resultat.fiche_contenu,
+      })
+    } finally {
+      setExportEnCours(false)
+    }
   }
 
   return (
@@ -181,7 +187,9 @@ export default function DevoirGenerator() {
             {sauvegardeEnCours ? 'Enregistrement…' : 'Enregistrer'}
           </button>
           {formatChoisi.needsFiche && (
-            <button type="button" className="plai-btn" onClick={exporterFiche}>Exporter la fiche (.docx)</button>
+            <button type="button" className="plai-btn" onClick={exporterFiche} disabled={exportEnCours}>
+              {exportEnCours ? 'Export…' : 'Exporter la fiche (.docx)'}
+            </button>
           )}
 
           {sauvegardeStatut && (
