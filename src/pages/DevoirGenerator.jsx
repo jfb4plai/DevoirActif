@@ -23,6 +23,7 @@ export default function DevoirGenerator() {
     setEnCours(true)
     setErreur('')
     setResultat(null)
+    setSauvegardeStatut(null)
     try {
       const { data: session } = await supabase.auth.getSession()
       const token = session?.session?.access_token
