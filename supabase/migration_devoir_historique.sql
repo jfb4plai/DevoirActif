@@ -1,7 +1,7 @@
 -- devoiractif/supabase/migration_devoir_historique.sql
 create table devoir_historique (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users not null,
+  user_id uuid references auth.users on delete cascade not null,
   niveau text not null,
   matiere text not null,
   competence text not null,
@@ -10,6 +10,8 @@ create table devoir_historique (
   fiche_contenu text not null default '',
   created_at timestamptz default now()
 );
+
+create index idx_devoir_historique_user_id on devoir_historique(user_id);
 
 alter table devoir_historique enable row level security;
 
