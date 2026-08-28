@@ -3,7 +3,7 @@ import Login from './pages/Login.jsx'
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx'
 
 function AppContent() {
-  const { user, loading, signOut } = useAuth()
+  const { user, loading, signOut, passwordRecovery } = useAuth()
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
@@ -20,7 +20,7 @@ function AppContent() {
       </nav>
 
       <div className="plai-container">
-        {loading ? null : user ? <DevoirGenerator /> : <Login />}
+        {loading ? null : user && !passwordRecovery ? <DevoirGenerator /> : <Login />}
       </div>
 
       <footer className="plai-footer">
