@@ -26,6 +26,13 @@ function AppContent() {
       <footer className="plai-footer">
         <p>DevoirActif — outil PLAI, Pôle Territorial de la Ville de Liège</p>
         <p>Devoirs P4-P6 conçus pour résister à la délégation à l'IA générative</p>
+        <p>
+          Code :{' '}
+          <a href="https://polyformproject.org/licenses/noncommercial/1.0.0" target="_blank" rel="noopener noreferrer">PolyForm Noncommercial 1.0.0</a>
+          {' · '}Contenus :{' '}
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>
+          {' · '}Jean-François Beguin, jfb4plai.com
+        </p>
       </footer>
     </div>
   )
